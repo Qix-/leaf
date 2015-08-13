@@ -100,7 +100,7 @@ function tickLeaf(leaf) {
 				we don't error here due to the fact some leafs might be piped
 				to from a foreign leaf, and it might only support a few signals.
 
-				we don't want to error out of a stray random unsupported signal
+				we don't want to error out if a stray random unsupported signal
 				is found.
 			*/
 			nextTickLeaf(leaf);
