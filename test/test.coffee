@@ -6,6 +6,17 @@ it 'should add a handler', ->
   leaf.addHandler 'foo', -> 'yep'
   leaf._handler['foo']().should.equal 'yep'
 
+it 'should remove a handler', ->
+  leaf = new Leaf
+  leaf.removeHandler 'connect'
+  (should leaf._handler['connect']).not.be.ok()
+
+it 'should replace a handler', ->
+  leaf = new Leaf
+  leaf.addHandler 'foo', -> 1234
+  leaf.replaceHandler 'foo', -> 2345
+  leaf._handler['foo']().should.equal 2345
+
 it 'should have connect and disconnect handlers by default', ->
   leaf = new Leaf
   (should leaf._handler['connect']).be.ok().and.a.Function()
