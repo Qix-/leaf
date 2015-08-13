@@ -22,7 +22,7 @@ function Leaf(useDefaultHandlers) {
 
 Leaf.prototype = {
 	connect: function connect(leaf, cb) {
-		assertLeaf(leaf, cb);
+		assertLeaf(leaf);
 
 		if (this._outputs.indexOf(leaf) === -1) {
 			this.signal({signal: 'connect', leaf: leaf}, cb);
@@ -32,7 +32,7 @@ Leaf.prototype = {
 	},
 
 	disconnect: function disconnect(leaf, cb) {
-		assertLeaf(leaf, cb);
+		assertLeaf(leaf);
 
 		if (this._outputs.indexOf(leaf) !== -1) {
 			this.signal({signal: 'disconnect', leaf: leaf}, cb);
@@ -70,12 +70,8 @@ Leaf.prototype = {
 	}
 };
 
-function assertLeaf(leaf, cb) {
+function assertLeaf(leaf) {
 	if (!(leaf instanceof Leaf)) {
-		if (cb instanceof Function) {
-			return cb('not a leaf');
-		}
-
 		throw new Error('not a leaf');
 	}
 }
@@ -92,8 +88,7 @@ function tickLeaf(leaf) {
 
 	if (!signal.signal) {
 		nextTickLeaf(leaf);
-		cb.call(signal, 'signal is missing `.signal\' property');
-		return;
+		return cb.call(signal, 'signal is missing `.signal\' property');
 	}
 
 	var handler = leaf._handler[signal.signal];
@@ -109,8 +104,7 @@ function tickLeaf(leaf) {
 				is found.
 			*/
 			nextTickLeaf(leaf);
-			cb.call();
-			return;
+			return cb.call();
 		}
 	}
 
@@ -121,10 +115,6 @@ function tickLeaf(leaf) {
 }
 
 function nextTickLeaf(leaf) {
-	if (!leaf._busy) {
-		return;
-	}
-
 	leaf._busy = false;
 	process.nextTick(function () {
 		tickLeaf(leaf);

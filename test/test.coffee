@@ -150,3 +150,18 @@ it 'should broadcast a signal to all outputs', (done)->
           sig3.should.equal 1334
           sig4.should.equal 2468
           done()
+
+it 'should error on duplicate connects', (done)->
+  leaf = new Leaf
+  leaf.connect leaf, (err)->
+    if err then return done err
+    (-> leaf.connect leaf).should.throw()
+    done()
+
+it 'should error on duplicate disconnects', ->
+  leaf = new Leaf
+  (-> leaf.disconnect leaf).should.throw()
+
+it 'should error on duplicate handlers', ->
+  leaf = new Leaf
+  (-> leaf.addHandler 'connect', (->)).should.throw()

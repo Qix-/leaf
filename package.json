@@ -33,7 +33,8 @@
   },
   "xo": {
     "rules": {
-      "no-invalid-this": 0
+      "no-invalid-this": 0,
+      "consistent-return": 0
     }
   },
   "devDependencies": {
