@@ -23,6 +23,7 @@ function Leaf(useDefaultHandlers) {
 Leaf.prototype = {
 	connect: function connect(leaf, cb) {
 		assertLeaf(leaf);
+		cb = ensureCallback(cb);
 
 		if (this._outputs.indexOf(leaf) === -1) {
 			this.signal({signal: 'connect', leaf: leaf}, cb);
@@ -33,6 +34,7 @@ Leaf.prototype = {
 
 	disconnect: function disconnect(leaf, cb) {
 		assertLeaf(leaf);
+		cb = ensureCallback(cb);
 
 		if (this._outputs.indexOf(leaf) !== -1) {
 			this.signal({signal: 'disconnect', leaf: leaf}, cb);
@@ -42,20 +44,15 @@ Leaf.prototype = {
 	},
 
 	broadcast: function broadcast(sig, cb) {
+		cb = ensureCallback(cb);
+
 		async.each(this._outputs.slice(), function (output, cb) {
 			output.signal(sig, cb);
 		}, cb);
 	},
 
 	signal: function signal(sig, cb) {
-		if (!(cb instanceof Function)) {
-			cb = function (err) {
-				if (err) {
-					err = err instanceof Error ? err : new Error(err);
-					throw err;
-				}
-			};
-		}
+		cb = ensureCallback(cb);
 
 		this._signals.unshift([sig, cb]);
 		tickLeaf(this);
@@ -66,6 +63,18 @@ Leaf.prototype = {
 			throw new Error('handler already registered: ' + name);
 		}
 
+		this.replaceHandler(name, handler);
+	},
+
+	removeHandler: function removeHandler(name) {
+		if (name in this._handler) {
+			delete this._handler[name];
+		} else {
+			throw new Error('handler not registered: ' + name);
+		}
+	},
+
+	replaceHandler: function replaceHandler(name, handler) {
 		this._handler[name] = handler;
 	}
 };
@@ -131,6 +140,19 @@ function leafDisconnect(signal, cb) {
 	arrayWithout.inline(this._outputs, signal.leaf);
 	arrayWithout.inline(signal.leaf._inputs, this);
 	cb();
+}
+
+function ensureCallback(cb) {
+	if (!(cb instanceof Function)) {
+		return function (err) {
+			if (err) {
+				err = err instanceof Error ? err : new Error(err);
+				throw err;
+			}
+		};
+	}
+
+	return cb;
 }
 
 module.exports = Leaf;

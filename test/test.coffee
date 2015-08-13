@@ -63,8 +63,8 @@ it 'should disconnect from a second leaf', (done)->
 
 it 'should not allow-non leafs', ->
   leaf = new Leaf
-  (-> leaf.connect 'hello').should.throw()
-  (-> leaf.disconnect 'hello').should.throw()
+  (-> leaf.connect 'hello').should.throw 'not a leaf'
+  (-> leaf.disconnect 'hello').should.throw 'not a leaf'
   (-> leaf.connect leaf).should.not.throw()
   (-> leaf.disconnect leaf).should.not.throw()
 
@@ -85,7 +85,7 @@ it 'should not execute if busy', ->
 
 it 'should error on invalid signal', ->
   leaf = new Leaf
-  (-> leaf.signal {}).should.throw()
+  (-> leaf.signal {}).should.throw 'signal is missing `.signal\' property'
 
 it 'should gracefully ignore bad handlers', (done)->
   leaf = new Leaf
@@ -155,13 +155,19 @@ it 'should error on duplicate connects', (done)->
   leaf = new Leaf
   leaf.connect leaf, (err)->
     if err then return done err
-    (-> leaf.connect leaf).should.throw()
+    (-> leaf.connect leaf).should.throw 'leaf already connected'
     done()
 
 it 'should error on duplicate disconnects', ->
   leaf = new Leaf
-  (-> leaf.disconnect leaf).should.throw()
+  (-> leaf.disconnect leaf).should.throw 'leaf not connected'
 
-it 'should error on duplicate handlers', ->
+it 'should error on duplicate handler add', ->
   leaf = new Leaf
-  (-> leaf.addHandler 'connect', (->)).should.throw()
+  (-> leaf.addHandler 'connect', (->)).should.throw \
+    'handler already registered: connect'
+
+it 'should error on duplicate handler remove', ->
+  leaf = new Leaf
+  (-> leaf.removeHandler 'foobar', (->)).should.throw \
+    'handler not registered: foobar'
