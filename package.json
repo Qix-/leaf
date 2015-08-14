@@ -1,7 +1,7 @@
 {
   "name": "leaf",
   "description": "Simple, chronological signal trees",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "author": "Qix (http://github.com/qix-)",
   "keywords": [
     "async",
