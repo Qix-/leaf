@@ -29,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "http://github.com/qix-/node-leaf.git"
+    "url": "http://github.com/qix-/leaf.git"
   },
   "xo": {
     "rules": {
